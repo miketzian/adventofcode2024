@@ -1,7 +1,9 @@
 package com.github.dekmetzi.aoc2024.util;
 
+
 import java.text.DecimalFormat;
 import java.time.Instant;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -23,14 +25,10 @@ public class PuzzleTimer {
         return this;
     }
 
-    public long ns() {
+    public Duration duration() {
         if (end.isEmpty())
             throw new IllegalStateException("still running");
-        return end.get().getNano() - start.getNano();
-    }
-
-    public long ms() {
-        return TimeUnit.NANOSECONDS.toMillis(ns());
+        return Duration.between(start, end.get());
     }
 
     // would not compile without an argument..
@@ -40,9 +38,17 @@ public class PuzzleTimer {
 
     @Override
     public String toString() {
-        long ns = ns();
-        var nsString = new DecimalFormat( "###,###" ).format(ns);
-        long ms = TimeUnit.NANOSECONDS.toMillis(ns);
-        return String.format("%dms (%sns)", ms, nsString);
+
+        if (end.isEmpty())
+        {
+            return "[running]";
+        }
+        var duration = duration();
+
+        var nsString = new DecimalFormat( "###,###" ).format(duration.toNanosPart());
+
+        return String.format("%dms (%sns)",
+                // duration.toSecondsPart(),
+                duration.toMillisPart(), nsString);
     }
 }
